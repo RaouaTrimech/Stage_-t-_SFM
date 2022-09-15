@@ -82,6 +82,7 @@ class _FicheSiteState extends State<FicheSite> {
     nbBrEtage = 0;
     ///initialiser l'instance du Site
     site = Site(
+      id: 0,
       reseauTGBTetudie: '',
       GTB_GTC: '',
       AdresseSite: '',
@@ -371,7 +372,7 @@ class _FicheSiteState extends State<FicheSite> {
                                     return null;
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Surface plancher su site(SHON)',
+                                    labelText: 'Surface plancher su site',
                                     labelStyle: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
@@ -440,77 +441,105 @@ class _FicheSiteState extends State<FicheSite> {
                             ],
                           ),
                         ),
-                        ///presence d'une GTB/GTC'
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                                labelText: "Présence d'une GTB/GTC",
-                                labelStyle: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(105, 103, 103, 1),
-                                      width: 1.5),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(247, 131, 27, 0.73),
-                                      width: 1.5),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                        ///presence d'une GTB/GTC'+message d'information
+                        Tooltip(
+                          preferBelow: false,
+                          message: 'GTB: Gestion Technique du Bâtiment \n GTC: Gestion Technique Centralisée',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ///Boutton Info
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Image.asset("assets/button_Images/icons_info.png" ,scale: 1.5,),
                               ),
-                              validator: (value) =>
-                              value == null
-                                  ? "Veuillez saisir votre activité principale"
-                                  : null,
-                              value: Presence_GTB_GTC,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  Presence_GTB_GTC = newValue!;
-                                  site.GTB_GTC = Presence_GTB_GTC!;
-                                });
-                              },
-                              items: dropdownItems_Presence_GTB_GTC),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: DropdownButtonFormField(
+                                    decoration: InputDecoration(
+                                      labelText: "Présence d'une GTB/GTC",
+                                      labelStyle: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Color.fromRGBO(105, 103, 103, 1),
+                                            width: 1.5),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Color.fromRGBO(247, 131, 27, 0.73),
+                                            width: 1.5),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    validator: (value) =>
+                                    value == null
+                                        ? "Veuillez saisir votre activité principale"
+                                        : null,
+                                    value: Presence_GTB_GTC,
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        Presence_GTB_GTC = newValue!;
+                                        site.GTB_GTC = Presence_GTB_GTC!;
+                                      });
+                                    },
+                                    items: dropdownItems_Presence_GTB_GTC),
+                              ),
+                            ],
+                          ),
                         ),
                         ///Réseau TGBT etudié
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            onChanged: (value){
-                              setState(() {
-                                site.reseauTGBTetudie = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez saisir le nom du Réseau TGBT etudié';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Réseau/TGBT Etudié',
-                              labelStyle: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                        Tooltip(
+                          preferBelow: false,
+                          message: 'TGBT:  Tableau Général Basse Tension',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ///Boutton Info
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Image.asset("assets/button_Images/icons_info.png" ,scale: 1.5,),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(105, 103, 103, 1),
-                                    width: 1.5),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(247, 131, 27, 0.73),
-                                    width: 1.5),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  onChanged: (value){
+                                    setState(() {
+                                      site.reseauTGBTetudie = value;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Veuillez saisir le nom du Réseau TGBT etudié';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Réseau/TGBT Etudié',
+                                    labelStyle: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Color.fromRGBO(105, 103, 103, 1),
+                                          width: 1.5),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Color.fromRGBO(247, 131, 27, 0.73),
+                                          width: 1.5),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
 
-                            ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         ///nombre d'étages/zones
@@ -600,7 +629,7 @@ class _FicheSiteState extends State<FicheSite> {
                           width: 355,
                           child: ElevatedButton(
                             onPressed: (){
-                              //save data
+                              ///save data
                               if(_formFSKey.currentState!.validate()){
                                 SiteDB.instance.createSite(site);
                                 Navigator.push(
@@ -615,6 +644,10 @@ class _FicheSiteState extends State<FicheSite> {
                               backgroundColor: MaterialStateProperty.all(Color.fromRGBO(0, 102, 175, 1),),
                             ),
                           ),
+                        ),
+                        ///buttom Space
+                        SizedBox(
+                          height:20,
                         ),
                       ],
                     ),

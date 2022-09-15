@@ -7,12 +7,12 @@ class SiteFields {
   ];
 
   static final String id = '_id';
-  static final String NomSite = '_NomSite';
-  static final String AdresseSite = 'AdresseSite';
-  static final String AnneeConstruction = 'AnneeConstruction';
-  static final String Activite ='Activite';
-  static final String SurfaceSHON= 'SurfaceSHON';
-  static final String GTB_GTC = 'GTB_GTC';
+  static final String NomSite = 'nomSite';
+  static final String AdresseSite = 'adresseSite';
+  static final String AnneeConstruction = 'anneeConstruction';
+  static final String Activite ='activite';
+  static final String SurfaceSHON= 'surfaceSHON';
+  static final String GTB_GTC = 'gTB_GTC';
   static final String reseauTGBTetudie = 'reseauTGBTetudie';
   static final String typeSite = 'typeSite';
 }
@@ -32,12 +32,12 @@ class Site {
     this.id,
     required this.NomSite,
     required this.AdresseSite,
+    required this.typeSite,
     required this.AnneeConstruction,
     required this.Activite,
     required this.SurfaceSHON,
     required this.GTB_GTC,
     required this.reseauTGBTetudie,
-    required this.typeSite,
   });
 
   Site copy({
@@ -72,6 +72,7 @@ class Site {
     SiteFields.GTB_GTC: GTB_GTC,
     SiteFields.reseauTGBTetudie: reseauTGBTetudie,
     SiteFields.typeSite: typeSite,
+    SiteFields.Activite: Activite,
   };
 
   static Site fromJson(Map<String,Object?> json) => Site(

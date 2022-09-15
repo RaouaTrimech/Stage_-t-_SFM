@@ -1,8 +1,9 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:stage_ete/Affichage/Affich.dart';
 
 import 'Forms/Fiche_Site.dart';
-
+import 'globals.dart' as globals;
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -79,6 +80,6 @@ class SplashScreen extends StatelessWidget {
         splashTransition: SplashTransition.fadeTransition,
         splashIconSize: 350,
         duration:5,
-        nextScreen: FicheSite());
+        nextScreen:(globals.creer == 0) ? FicheSite() : Affich());
   }
 }

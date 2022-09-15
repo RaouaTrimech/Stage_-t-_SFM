@@ -6,7 +6,7 @@ class ZoneEquipFields {
   ];
 
   static final String id = '_id';
-  static final String NomZone = '_NomZone';
+  static final String NomZone = 'NomZone';
   static final String IdBoltix = 'IdBoltix';
 }
 

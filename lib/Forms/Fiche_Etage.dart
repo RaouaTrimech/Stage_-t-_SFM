@@ -2,8 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:im_stepper/stepper.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:stage_ete/db/Site_db.dart';
 
 import 'Fiche_SousEspace.dart';
+//import '../Fiche_SousEspace1.dart';
 import 'Info_Equip.dart';
 
 
@@ -24,6 +26,9 @@ class FicheEtage extends StatefulWidget {
 }
 
 class _FicheEtageState extends State<FicheEtage> {
+
+  ///Form key
+   late GlobalKey<FormState> _formFSKey  ;
 
   ///nombre de etage selectionnés
   late int _nbEtage;
@@ -49,7 +54,7 @@ class _FicheEtageState extends State<FicheEtage> {
     ///l'étape ective qui indique l'étage
     int activeStep = 0;
 
-    ///la liste des sous_espaces a afficher
+    ///la liste des sous_espaces à afficher
     List<SousEspace> ESE = [];
 
     ///la liste des nombres affichés pour les étages
@@ -65,7 +70,7 @@ class _FicheEtageState extends State<FicheEtage> {
     void buildEtage(){
     if(ESE.isEmpty){
       for(int i = 0 ; i<_nbEtage ; i++){
-        ESE.add(SousEspace(numEtage: i, nbEtage: _nbEtage,eclairage: _eclairage,nbBrEtage: _nbBrEtage,));
+        ESE.add(SousEspace(numEtage: i, nbEtage: _nbEtage,eclairage: _eclairage,nbBrEtage: _nbBrEtage, SSespace: [],));
       }
     }
 
@@ -80,10 +85,12 @@ class _FicheEtageState extends State<FicheEtage> {
 
   @override
   void initState() {
+
     _nbEtage = widget.nbEtage;
     _nbBrEtage = widget.nbBrEtage;
     _eclairage = widget.eclairage;
     activeStep= 0;
+    _formFSKey = GlobalKey<FormState>();
 
     buildEtageNumber(_nbEtage);
     buildEtage();
@@ -93,19 +100,20 @@ class _FicheEtageState extends State<FicheEtage> {
     itemPositionsListener.itemPositions.addListener(() {
       final indices = itemPositionsListener.itemPositions.value
           .where((item) {
-        final isTopVisible = item.itemLeadingEdge >=0;
-        final isBottomVisible = item.itemTrailingEdge<=1;
+         final isTopVisible = item.itemLeadingEdge >=0;
+         //final isBottomVisible = item.itemTrailingEdge<=1;
 
-        return isTopVisible && isBottomVisible;
+        //return isTopVisible && isBottomVisible;
+        return isTopVisible ;
       })
           .map((item) => item.index).toList();
-
 
       ///changer la valeur de activeStep pour transferer while scrolling
       if(indices.isNotEmpty && activeStep != indices.first){
         setState((){
           activeStep =indices.first ;
         });
+        print(' this is the indices : ${indices.first}');
       }
       ///écrire activeStep pour vérifier
       print(' this is the activeStep : $activeStep');
@@ -133,7 +141,7 @@ class _FicheEtageState extends State<FicheEtage> {
                     Icons.arrow_left_outlined),
                 color: Color.fromRGBO(0, 102, 175, 1),
               ),
-              //title
+              ///title
               Container(
                 margin: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: Text(
@@ -167,6 +175,7 @@ class _FicheEtageState extends State<FicheEtage> {
           SizedBox(height: 20),
 
           ///Body
+          
           ///affichage des numéros des étages
           NumberStepper(
             numbers: Numbers,
@@ -181,14 +190,17 @@ class _FicheEtageState extends State<FicheEtage> {
           ),
           SizedBox(height: 20),
           ///affichage de la liste des sous_espaces
-          Expanded(
-            child: ScrollablePositionedList.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: ESE.length,
-              itemBuilder: (context, index) => showESE(index),
-              itemScrollController: itemScrollController,
-              itemPositionsListener: itemPositionsListener,
+          Form(
+            key: _formFSKey,
+            child: Expanded(
+              child: ScrollablePositionedList.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: ESE.length,
+                itemBuilder: (context, index) => showESE(index),
+                itemScrollController: itemScrollController,
+                itemPositionsListener: itemPositionsListener,
+              ),
             ),
           ),
           SizedBox(height: 20),
@@ -199,12 +211,24 @@ class _FicheEtageState extends State<FicheEtage> {
               width: 355,
               child: ElevatedButton(
                 onPressed: (){
-                  ///save data for all the sous_espace ---> still not done
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  InfoEquipement(index: 0,nbEtage: _nbEtage,)),
-                  );
+                  if(_formFSKey.currentState!.validate()){
+                    _formFSKey.currentState!.save();
+                    ///save data for all the sous_espace ---> still not done
+                    for(int i=0 ; i<ESE.length ; i++){
+                      for(int j=0; j<ESE[i].SSespace.length ;j++){
+                        SiteDB.instance.createSsEspace(ESE[i].SSespace[j]);
+                      }
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  InfoEquipement(index: 0,nbEtage: _nbEtage, nbBrEtage: _nbBrEtage,)),
+                    );
+                  }else{
+                    print('Noooooo');
+                  }
                 },
+
                 child: Text("Suivant"),
                 style:  ButtonStyle(
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
@@ -212,6 +236,10 @@ class _FicheEtageState extends State<FicheEtage> {
                 ),
               ),
             ),
+          ),
+          ///buttom Space
+          SizedBox(
+            height:20,
           ),
         ],
       ),

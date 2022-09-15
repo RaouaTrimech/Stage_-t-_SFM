@@ -5,12 +5,13 @@ import 'package:flutter_time_range/flutter_time_range.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../Model/horaire_occup_database.dart';
 import '../db/Site_db.dart';
-
+import 'package:stage_ete/globals.dart' as globals ;
 
 class Horaires_Occup extends StatefulWidget {
   Widget wid ;
   int id_SSE;
-  Horaires_Occup({Key? key , required this.wid , required this.id_SSE}) : super(key: key);
+  int select;
+  Horaires_Occup({Key? key , required this.wid , required this.id_SSE, required this.select}) : super(key: key);
 
   @override
   State<Horaires_Occup> createState() => _Horaires_OccupState();
@@ -22,9 +23,15 @@ class _Horaires_OccupState extends State<Horaires_Occup> {
   late int _id_SSE;
   late bool isCliked  ;
 
+  late int _select ;
+
+  /*variable bool to determine if selected */
+  //bool _selected = false ;
+
   void initState() {
     super.initState();
     _id_SSE = widget.id_SSE;
+    _select = widget.select;
 
     buildOccupHoursList();
   }
@@ -110,13 +117,16 @@ class _Horaires_OccupState extends State<Horaires_Occup> {
           initialFromMinutes: DateTime.now().minute,
           initialToHour: DateTime.now().hour,
           initialToMinutes: DateTime.now().minute,
-          backText: "Back",
-          nextText: "Next",
+          backText: "Retour",
+          nextText: "Passer",
           cancelText: " ",
           selectText: "Sauvegarder",
           editable: true,
           is24Format: true,
+          tabFromText: "De",
+          tabToText: "Jusqu'à",
           disableTabInteraction: true,
+
           iconNext: Icon(Icons.arrow_forward, size: 12),
           iconBack: Icon(Icons.arrow_back, size: 12),
           iconSelect: Icon(Icons.check, size: 12),
@@ -274,6 +284,7 @@ class _Horaires_OccupState extends State<Horaires_Occup> {
                                     Horaires_Occupa.elementAt(i).id_ssEspace = _id_SSE;
                                     SiteDB.instance.createHourOccup(Horaires_Occupa.elementAt(i));
                                   }
+
                                   Navigator.pop(context);
 
                                 },
@@ -302,7 +313,11 @@ class _Horaires_OccupState extends State<Horaires_Occup> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => buildOccupHours(),
+      onTap: () {
+        buildOccupHours();
+        globals.selected[_select]= 'Set' ;
+        print(globals.selected[_select]);
+      },
       child: widget.wid,
     );
   }

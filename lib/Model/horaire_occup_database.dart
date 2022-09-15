@@ -10,7 +10,7 @@ class HoraireOccupFields {
   static  String days = '_days';
   static  String debutHour = '_debutHour';
   static  String finHour= '_finHour';
-  static  String id_SsE= '_idSsE';
+  static  String id_SsE= '_idSSE';
 
 
 }

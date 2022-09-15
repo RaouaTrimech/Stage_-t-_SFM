@@ -11,6 +11,7 @@ import '../db/Site_db.dart';
 class InfoEquipement_ZM extends StatefulWidget {
   String ScannedID ;
 
+
   InfoEquipement_ZM( {Key? key , required this.ScannedID }) : super(key: key);
 
   @override
@@ -144,7 +145,7 @@ class _InfoEquipement_ZMState extends State<InfoEquipement_ZM> {
                             ),
                           ),
                         ),
-                        //Id Booster Voltix --->this field takes the scanned value
+                        ///Id Booster Voltix --->this field takes the scanned value
                         /*Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownButtonFormField(
@@ -217,7 +218,7 @@ class _InfoEquipement_ZMState extends State<InfoEquipement_ZM> {
                             ),
                           ),
                         ),
-                        //Scanner Voltix
+                        ///Scanner Voltix
                         Container(
                           margin: EdgeInsets.only(top: 40),
                           height: 60,
@@ -256,7 +257,7 @@ class _InfoEquipement_ZMState extends State<InfoEquipement_ZM> {
                             ),
                           ),
                         ),
-                        //sauvegarder réglements
+                        ///sauvegarder réglements
                         Container(
                           margin: EdgeInsets.only(top: 40),
                           height: 30,

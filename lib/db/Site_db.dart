@@ -1,10 +1,12 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:stage_ete/Model/nb_equipement_etage_database.dart';
 import '../Model/equipement_database.dart';
 import '../Model/horaire_occup_database.dart';
 import '../Model/site_database.dart';
 import '../Model/sous_espace_database.dart';
 import '../Model/zone_equipement_database.dart';
+import 'package:stage_ete/globals.dart' as globals;
 
 class SiteDB {
   static final SiteDB instance = SiteDB._init();
@@ -15,12 +17,15 @@ class SiteDB {
 
   Future<Database> get database async {
     if(_database != null) return _database!;
+    if(_database != null) {
+      globals.creer = 1;
+      print(globals.creer);
+    }
 
     _database = await _initDB('Site.db');
 
     return _database!;
   }
-
 
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
@@ -43,14 +48,14 @@ class SiteDB {
     await db.execute('''
     CREATE TABLE $tableSites(
     ${SiteFields.id} $idType,
+    ${SiteFields.NomSite} $stringType,
     ${SiteFields.AdresseSite} $stringType,
     ${SiteFields.AnneeConstruction} $stringType,
     ${SiteFields.Activite} $stringType,
     ${SiteFields.SurfaceSHON} $floatType,
     ${SiteFields.GTB_GTC} $stringType,
     ${SiteFields.reseauTGBTetudie} $stringType,
-    ${SiteFields.typeSite} $stringType,
-    
+    ${SiteFields.typeSite} $stringType
     )
     ''');
 
@@ -63,9 +68,7 @@ class SiteDB {
     ${EquipFields.TypeEquipement} $stringType,
     ${EquipFields.Puissance} $floatType,
     ${EquipFields.Marque} $stringType,
-    ${EquipFields.Image} $stringType,
-    ${EquipFields.Id_Etage} $intType,
-    ${EquipFields.Id_SSE} $intType,
+    ${EquipFields.Image} $stringType
     )
     ''');
 
@@ -90,7 +93,7 @@ class SiteDB {
     ${SousEspaceFields.NomBureau} $stringType,
     ${SousEspaceFields.Surface} $floatType,
     ${SousEspaceFields.nbPersonne} $integerType,
-    ${SousEspaceFields.IdEtage} $integerType,
+    ${SousEspaceFields.NomEtage} $stringType
     )
     ''');
 
@@ -100,13 +103,26 @@ class SiteDB {
     CREATE TABLE $tableZoneEquip(
     ${ZoneEquipFields.id} $idType,
     ${ZoneEquipFields.NomZone} $stringType,
-    ${ZoneEquipFields.IdBoltix} $stringType,
+    ${ZoneEquipFields.IdBoltix} $stringType
+    )
+    ''');
+    ///////////////////////////////////
+
+    ///nb_equipement_SSE_database.dart
+    ///////////////////////////////////
+    await db.execute('''
+    CREATE TABLE $tableNbEquipSSE(
+    ${NbEquipSSEFields.id_SSE} $intType,
+    ${NbEquipSSEFields.id_Equip} $intType,
+    ${NbEquipSSEFields.nbre} $intType,
+    PRIMARY KEY(${NbEquipSSEFields.id_SSE},${NbEquipSSEFields.id_Equip}),
+    FOREIGN KEY (${HoraireOccupFields.id_SsE}) REFERENCES $tableSousEspaces(${SousEspaceFields.id}),
+    FOREIGN KEY (${NbEquipSSEFields.id_Equip}) REFERENCES $tableEquipements(${EquipFields.id})
     )
     ''');
     ///////////////////////////////////
 
   }
-
 
   /// CRUD Site
   Future<Site> createSite(Site site) async {
@@ -160,12 +176,13 @@ class SiteDB {
   /////////////////////////////////
 
   /// CRUD Equip
-  Future<Equip> createEquip(Equip equip) async {
+  Future<int> /*Future<Equip>*/ createEquip(Equip equip) async {
     final db = await instance.database;
 
     final id = await db.insert(tableEquipements, equip.toJson());
 
-    return equip.copy(id: id);
+    //return equip.copy(id: id);
+    return id;
   }
 
   Future<Equip> readEquip(int id) async {
@@ -191,14 +208,14 @@ class SiteDB {
     return result.map((json)=> Equip.fromJson(json)).toList();
   }
 
-  Future<List<Equip>> readEquipsEtage(int etage) async {
+  /*Future<List<Equip>> readEquipsEtage(int etage) async {
     final db = await instance.database;
     final result = await db.query(tableEquipements,
       where: '${EquipFields.Id_Etage} = ?',
       whereArgs: [etage],
     );
     return result.map((json)=> Equip.fromJson(json)).toList();
-  }
+  }*/
 
   Future<int> updateEquip(Equip equip) async {
     final db = await instance.database;
@@ -251,7 +268,7 @@ class SiteDB {
     return result.map((json)=> SsEspace.fromJson(json)).toList();
   }
 
-  Future<List<SsEspace>> readSsEspacesEtage(int etage) async {
+  /*Future<List<SsEspace>> readSsEspacesEtage(int etage) async {
     final db = await instance.database;
     final result = await db.query(tableSousEspaces,
       where: '${EquipFields.Id_Etage} = ?',
@@ -259,6 +276,18 @@ class SiteDB {
     );
     ///converting the Map object to the Site objects
     return result.map((json)=> SsEspace.fromJson(json)).toList();
+  }*/
+
+  Future<SsEspace> readSsEspaceByNomEtage_NomSSE(String NomEtage , String NomBureau) async {
+    final db = await instance.database;
+    final result = await db.query(tableSousEspaces,
+      where: '${SousEspaceFields.NomEtage}=? and ${SousEspaceFields.NomBureau}=?',
+      whereArgs: [NomEtage,NomBureau],
+    );
+
+    ///converting the Map object to the Site objects
+    return result.map((json)=> SsEspace.fromJson(json)).toList().first;
+
   }
 
   Future<int> updateSsEspace(SsEspace ssEspace) async {
@@ -334,7 +363,7 @@ class SiteDB {
   Future<ZoneEquip> createZoneEquip(ZoneEquip zoneEquip) async {
     final db = await instance.database;
 
-    final id = await db.insert(tableSites, zoneEquip.toJson());
+    final id = await db.insert(tableZoneEquip, zoneEquip.toJson());
 
     return zoneEquip.copy(id: id);
   }
@@ -380,9 +409,112 @@ class SiteDB {
   }
 
   /////////////////////////////////
+  /// CRUD nbEquipEtage
+  Future<NbEquipSSE> createNbEquipEtage(NbEquipSSE nbEquipSSE) async {
+    final db = await instance.database;
+
+    final id = await db.insert(tableNbEquipSSE, nbEquipSSE.toJson());
+
+    return nbEquipSSE.copy(
+        id_Equip: nbEquipSSE.id_Equip,
+        id_SSE: nbEquipSSE.id_Equip,
+        nbre:nbEquipSSE.nbre,
+    );
+  }
+
+  Future<NbEquipSSE> readNbEquipEtage(int id_Equip , int id_SSE) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      tableNbEquipSSE,
+      columns: NbEquipSSEFields.values,
+      where: '${NbEquipSSEFields.id_Equip} = ?,${NbEquipSSEFields.id_SSE} = ?',
+      whereArgs: [id_Equip,id_SSE],
+    );
+
+    if(maps.isNotEmpty){
+      return NbEquipSSE.fromJson(maps.first);
+    }else{
+      throw Exception("ID ($id_Equip,$id_SSE) n'existe pas");
+    }
+  }
+
+  Future<List<NbEquipSSE>> readAllNbEquipSSEs() async {
+    final db = await instance.database;
+    final result = await db.query(tableNbEquipSSE);
+    ///converting the Map object to the Site objects
+    return result.map((json)=> NbEquipSSE.fromJson(json)).toList();
+  }
+
+  Future<int> updateNbEquipSSE(NbEquipSSE nbEquipSSE) async {
+    final db = await instance.database;
+    return db.update(tableNbEquipSSE,
+      nbEquipSSE.toJson(),
+      where: '${NbEquipSSEFields.id_Equip} = ?,${NbEquipSSEFields.id_SSE} = ?',
+      whereArgs: [nbEquipSSE.id_Equip,nbEquipSSE.id_SSE],
+    );
+  }
+
+  Future<int> deleteNbEquipSSE(int id_Equip , int id_SSE) async {
+    final db = await instance.database;
+    return db.delete(tableNbEquipSSE,
+      where: '${NbEquipSSEFields.id_Equip} = ?,${NbEquipSSEFields.id_SSE} = ?',
+      whereArgs: [id_Equip,id_SSE],
+    );
+  }
+
+  /////////////////////////////////
 
   Future close() async {
     final db = await instance.database;
     db.close();
   }
+
+
+}
+
+class VoltixFields {
+  static final List<String> values = [
+    site,equipements,sousEspaces,
+  ];
+
+  static  String site = '_site';
+  static  String equipements = '_equipements';
+  static  String sousEspaces= '_sousEspaces';
+
+
+
+}
+
+class Voltix {
+
+  SiteDB site ;
+  List<Equip> equipements ;
+  List<SsEspace> sousEspaces ;
+
+  Voltix({required this.site , required this.equipements , required this.sousEspaces});
+
+  String affichJSONEquip(){
+    String Equip ="{";
+    for(int i=0; i< equipements.length ; i++){
+      Equip= Equip + equipements[i].toJson().toString() +"," ;
+    }
+    Equip = Equip + "}" ;
+    return Equip ;
+  }
+
+  String affichJSONSSE(){
+    String SSE ="{";
+    for(int i=0; i< sousEspaces.length ; i++){
+      SSE= SSE + sousEspaces[i].toJson().toString() +"," ;
+    }
+    SSE = SSE + "}" ;
+    return SSE ;
+  }
+
+  Map<String,Object?> toJson() => {
+    VoltixFields.site: site.readSite(0),
+    VoltixFields.equipements: affichJSONEquip(),
+    VoltixFields.sousEspaces: affichJSONSSE(),
+
+  };
 }

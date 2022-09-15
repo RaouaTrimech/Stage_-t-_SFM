@@ -2,14 +2,14 @@ final String tableSousEspaces = 'sousEspace';
 
 class SousEspaceFields {
   static final List<String> values = [
-    id,NomBureau,Surface,nbPersonne,IdEtage
+    id,NomBureau,Surface,nbPersonne,NomEtage
   ];
 
   static final String id = '_id';
   static final String NomBureau = '_NomBureau';
   static final String Surface= 'Surface';
   static final String nbPersonne = 'nbPersonne';
-  static final String IdEtage = 'IdEtage';
+  static final String NomEtage = 'NomEtage';
 
 }
 
@@ -18,7 +18,7 @@ class SsEspace {
   String NomBureau;
   double Surface;
   int nbPersonne;
-  int IdEtage;
+  int NomEtage;
 
 
   SsEspace({
@@ -26,7 +26,7 @@ class SsEspace {
     required this.NomBureau,
     required this.Surface,
     required this.nbPersonne,
-    required this.IdEtage,
+    required this.NomEtage,
 
   });
 
@@ -35,14 +35,14 @@ class SsEspace {
     String? NomBureau,
     double? Surface,
     int? nbPersonne,
-    int? IdEtage
+    int? NomEtage
 
   })=> SsEspace(
     id:  id ?? this.id,
     NomBureau: NomBureau ?? this.NomBureau,
     Surface: Surface ?? this.Surface,
     nbPersonne:  nbPersonne ?? this.nbPersonne,
-    IdEtage: IdEtage ?? this.IdEtage,
+    NomEtage: NomEtage ?? this.NomEtage,
 
   );
 
@@ -51,7 +51,7 @@ class SsEspace {
     SousEspaceFields.NomBureau: NomBureau,
     SousEspaceFields.Surface: Surface,
     SousEspaceFields.nbPersonne: nbPersonne,
-    SousEspaceFields.IdEtage: IdEtage,
+    SousEspaceFields.NomEtage: NomEtage,
   };
 
   static SsEspace fromJson(Map<String,Object?> json) => SsEspace(
@@ -59,6 +59,6 @@ class SsEspace {
     NomBureau: json[SousEspaceFields.NomBureau] as String,
     Surface:  json[SousEspaceFields.Surface] as double,
     nbPersonne:  json[SousEspaceFields.nbPersonne] as int,
-    IdEtage: json[SousEspaceFields.IdEtage] as int,
+    NomEtage: json[SousEspaceFields.NomEtage] as int,
   );
 }

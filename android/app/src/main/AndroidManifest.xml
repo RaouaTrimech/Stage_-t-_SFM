@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.stage_ete">
    <application
-        android:label="stage_ete"
+        android:label="Voltix"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

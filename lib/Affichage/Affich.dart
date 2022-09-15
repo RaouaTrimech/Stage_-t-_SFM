@@ -1,8 +1,19 @@
+//import 'dart:html';
+
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:stage_ete/Forms/Fiche_SousEspace.dart';
+import 'package:stage_ete/Model/equipement_database.dart';
+import 'package:stage_ete/Model/site_database.dart';
+import 'package:stage_ete/db/Site_db.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../Model/sous_espace_database.dart';
 import '../db/Consommation_Energy.dart';
+import '../main.dart';
+import 'notification_api.dart';
 
 
 class Affich extends StatefulWidget {
@@ -25,13 +36,60 @@ class _AffichState extends State<Affich> {
   //fictionnary number to try
   int nombreEtages = 10;
 
+  ///show notification variable
+  //late final LocalNotificationService service ;
+  int _counter = 0;
 
   initState(){
     _chartData = getchartData();
     _tooltipBehavior = TooltipBehavior(enable: true);
+/*
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription : channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_lancher',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new messageopen app event was published');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text("${notification.title}"),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text("${notification.body}")],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+*/
+    s = "";
     super.initState();
   }
-  //Fake data for the chart to work on
+  ///Fake data for the chart to work on
   List<EnergyConsumptionData> getchartData(){
     final List<EnergyConsumptionData> chartData = [
       EnergyConsumptionData(DateTime.now(),20,10),
@@ -166,6 +224,25 @@ class _AffichState extends State<Affich> {
       onChanged: (value) => setState(()=> this.Activate_Price = value),
     ),
   );
+  /*
+  void showNotification() {
+    setState(() {
+      _counter++;
+    });
+
+    flutterLocalNotificationsPlugin.show(
+        0,
+        "Testing $_counter",
+        "This is an Flutter Push Notification",
+        NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description,
+                importance: Importance.high,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher')));
+  }
+  */
 
   Widget buildEntete(int index){
     if(index ==1 || index ==2 ){
@@ -175,11 +252,45 @@ class _AffichState extends State<Affich> {
 
     return Container();
   }
+
+  late  String s ;
+  Future<void> returnData() async  {
+    List<Site> site = await SiteDB.instance.readAllSites() ;
+    List<SsEspace> sousEspaces = await SiteDB.instance.readAllSsEspaces();
+    List<Equip> equips = await SiteDB.instance.readAllEquips();
+
+    s = s+ site.first.toJson().toString();
+    for (int i = 0 ; i< sousEspaces.length ; i++ ){
+      s = s + sousEspaces[i].toJson().toString();
+    }
+    for (int i = 0 ; i< equips.length ; i++ ){
+      s = s + equips[i].toJson().toString();
+    }
+
+}
   Widget buildBody(int index ){
-    //home
+    ///home
+    ///---> exemple of a notification button on click
+
     if(index ==0){
-      return Text('Home Page');
-      //Live on
+      return Column(
+        children: [
+          Text('Home Page'),
+          /*
+          ElevatedButton(
+              onPressed:   showNotification,
+
+
+                /*title: 'Notification exemple',
+                body: 'this is the notification body',
+                payload: 'assets/Equipements/ChauffageClimatisation.png'*/
+              child: Text('click Notifiaction'),
+          ),
+          */
+          Text(s),
+        ],
+      );
+      ///Live on
     }
     else if (index ==1 ){
       return SingleChildScrollView(
@@ -210,14 +321,14 @@ class _AffichState extends State<Affich> {
                   //backgroundColor: Colors.white,
                   series: (Activate_Price) ?
                   <ChartSeries>[
-                    //energy chart
+                    ///energy chart
                     StackedLineSeries<EnergyConsumptionData,String?>(
                       dataSource: _chartData,
                       xValueMapper: (EnergyConsumptionData exp, _)=> "${exp.dateM}", /*DateFormat.Hms().format(exp.dateM)*/
                       yValueMapper:(EnergyConsumptionData exp, _)=> exp.consumption,
                       name: 'consommation Energie',
                     ),
-                    //money chart
+                    ///money chart
                     StackedLineSeries<EnergyConsumptionData,String?>(
                       dataSource: _chartData,
                       xValueMapper: (EnergyConsumptionData exp, _)=> "${exp.dateM}", /*DateFormat.Hms().format(exp.dateM)*/
@@ -256,7 +367,7 @@ class _AffichState extends State<Affich> {
         ),
 
       );
-      //Summary
+      ///Summary
     }
     else if (index ==2){
       return Expanded(
@@ -420,7 +531,7 @@ class _AffichState extends State<Affich> {
 
         ),
       );
-      //Configuration
+      ///Configuration
     }else if (index == 3){
       return Text('Config');
     }
@@ -429,7 +540,7 @@ class _AffichState extends State<Affich> {
   }
 
   Widget buildTitle(int index ){
-    //home
+    ///home
     if(index ==0){
       return Text(
         'Home',
@@ -452,7 +563,7 @@ class _AffichState extends State<Affich> {
           fontFamily: 'Prata',
         ),
       );
-      //Summary
+      ///Summary
     }
     else if (index ==2){
       return Text(
@@ -464,7 +575,7 @@ class _AffichState extends State<Affich> {
           fontFamily: 'Prata',
         ),
       );
-      //Configuration
+      ///Configuration
     }
     else if (index == 3){
       return Text(
